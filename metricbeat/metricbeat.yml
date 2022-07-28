@@ -1,0 +1,80 @@
+metricbeat.modules:
+# Kafka metrics collected using the Kafka protocol
+- module: kafka
+  #metricsets:
+  #  - partition
+  #  - consumergroup
+  period: 10s
+  hosts: ["kafka:9092"]
+
+  client_id: metricbeat
+  #retries: 3
+  #backoff: 250ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+  # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
+  #ssl.key_passphrase: "yourKeyPassphrase"
+
+  # SASL authentication
+  #username: ""
+  #password: ""
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
+# Metrics collected from a Kafka broker using Jolokia
+- module: kafka
+  metricsets:
+    - broker
+  period: 10s
+  hosts: ["kafka:8778"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  index: "metricbeat-kafka-%{[agent.version]}-%{+yyyy-MM-dd}"
+
+#============================== Dashboards =====================================
+setup:
+  dashboards:
+    enabled: true
+    always_kibana: true
+    retry.enabled: true
+    retry.interval: 20s
+    retry.maximum: 30
+  kibana:
+    host: "http://kibana:5601"
+    ssl:
+      enabled: false
+  template:
+    enabled: false
+
+logging:
+  level: debug
